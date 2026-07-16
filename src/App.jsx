@@ -12,6 +12,18 @@ import { Wrench, Shield, Search, FileText, LogOut, User } from 'lucide-react';
 export default function App() {
   const { isMobile } = useResponsive();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileMenuOpen && isMobile) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen, isMobile]);
+
   const [currentTab, setCurrentTab] = useState(() => {
     const saved = localStorage.getItem('semcorp_tab');
     return saved || 'ticket-gen';
@@ -119,11 +131,12 @@ export default function App() {
         </nav>
 
         {/* Global Controls & Auth State */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           
-          <div className="desktop-auth">
-            {loggedInUser && currentTab === 'staff' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingRight: '8px', borderRight: '1px solid var(--border-color)' }}>
+          <div className="desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <ThemeToggle />
+            {loggedInUser && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '12px', borderLeft: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', padding: '6px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
                   <User size={16} />
                 </div>
@@ -141,7 +154,10 @@ export default function App() {
                 </button>
               </div>
             )}
+          </div>
 
+          {/* Theme Toggle for mobile - only rendered/visible when desktop auth is hidden */}
+          <div className="mobile-auth-controls" style={{ alignItems: 'center', gap: '12px' }}>
             <ThemeToggle />
           </div>
 
@@ -174,6 +190,28 @@ export default function App() {
           </button>
         </div>
 
+        {loggedInUser && (
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', padding: '6px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+                <User size={16} />
+              </div>
+              <div style={{ fontSize: '14px', lineHeight: 1.2, flex: 1 }}>
+                <div style={{ fontWeight: 600 }}>{loggedInUser.name}</div>
+                <div style={{ color: 'var(--text-tertiary)', textTransform: 'capitalize', fontSize: '12px' }}>{loggedInUser.role}</div>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="btn btn-secondary"
+              style={{ width: '100%', padding: '8px 12px', fontSize: '13px', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', minHeight: '40px' }}
+              title="Log Out"
+            >
+              <LogOut size={14} /> Log Out
+            </button>
+          </div>
+        )}
+
         <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
           <button
             onClick={() => handleTabChange('ticket-gen')}
@@ -193,29 +231,6 @@ export default function App() {
           >
             <Shield size={18} /> Staff Workspace
           </button>
-        </div>
-
-        <div style={{ padding: '16px', borderTop: '1px solid var(--border-color)' }}>
-          <ThemeToggle />
-          {loggedInUser && (
-            <div className="drawer-user-info" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', padding: '6px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
-                <User size={16} />
-              </div>
-              <div style={{ fontSize: '12px', lineHeight: 1.2, flex: 1 }}>
-                <div style={{ fontWeight: 600 }}>{loggedInUser.name}</div>
-                <div style={{ color: 'var(--text-tertiary)', textTransform: 'capitalize' }}>{loggedInUser.role}</div>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="btn btn-secondary"
-                style={{ padding: '6px', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                title="Log Out"
-              >
-                <LogOut size={14} style={{ color: 'var(--danger)' }} />
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
